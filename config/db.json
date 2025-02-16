@@ -1,7 +1,7 @@
 {
-    "user": "postgres",
-    "password": "postgres",
-    "host": "localhost",
+    "user": "soulsync_user",
+    "password": "amUm4lZLF8Mu9KYPvKq1enWS5sdDQpLm",
+    "host": "dpg-cuon53dds78s738mfu5g-a",
     "port": 5432,
     "database": "soulsync"
 }
