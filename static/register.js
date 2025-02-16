@@ -1,4 +1,12 @@
 window.addEventListener("DOMContentLoaded", ()=>{
+    const email=localStorage.getItem("email");
+    const sessionToken=localStorage.getItem("sessionToken");
+    const userData=localStorage.getItem("userData");
+
+    if(email && sessionToken && userData) {
+        window.location.href="option.html";
+    }
+    
     const registerBtn=document.getElementById("register-btn");
     registerBtn.addEventListener("click", e=>{
         e.preventDefault();

@@ -16,6 +16,11 @@
         });
       }
     });
+
+    function logOut() {
+      localStorage.clear();
+      window.location.href="index.html";
+    }
   </script>
 </head>
 
@@ -27,7 +32,7 @@
     <div class="profile-container">
       <div class="profile-info">
         <span class="username">Hi, John Doe 👋</span> <!-- Replace with dynamic user data -->
-        <a href="logout.html" class="logout-button">Log Out</a>
+        <button onclick="logOut()" class="logout-button">Log Out</button>
       </div>
     </div>
   </header>
