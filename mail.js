@@ -13,7 +13,7 @@ const transporter = nodemailer.createTransport({
 // Define email options
 const mailOptions = {
     from: 'Team SSB', // Sender address
-    subject: 'Verify your SSB Account', // Subject line
+    subject: 'Verify your SoulSync Account', // Subject line
 };
 
 function generateOTP() {
@@ -24,7 +24,7 @@ function generateOTP() {
 async function sendOTP(email) {
     mailOptions.to=email;
     let otp=generateOTP();
-    mailOptions.text="Your OTP to verify your SSB account is "+otp;
+    mailOptions.text="Your OTP to verify your SoulSync account is "+otp;
     try {
         const info=transporter.sendMail(mailOptions);
         return {
