@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Call</title>
+</head>
+<body>
+    <h2>WebRTC Video Call</h2>
+    <video id="localVideo" autoplay playsinline></video>
+    <video id="remoteVideo" autoplay playsinline></video>
+    <button onclick="startCall()">Start Call</button>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
+
+
+const socket = io(window.location.origin, { secure: true });
+
+const localVideo = document.getElementById("localVideo");
+const remoteVideo = document.getElementById("remoteVideo");
+
+const peerConnection = new RTCPeerConnection({
+    iceServers: [{ urls: "stun:stun.l.google.com:19302" }] // Google STUN server
+});
+
+// Get user media (camera + mic)
+navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+    .then(stream => {
+        localVideo.srcObject = stream;
+
+        // Add local stream to PeerConnection
+        stream.getTracks().forEach(track => peerConnection.addTrack(track, stream));
+    })
+    .catch(error => console.error("Media error:", error));
+
+// Handle incoming tracks (Remote video)
+peerConnection.ontrack = (event) => {
+    remoteVideo.srcObject = event.streams[0];
+};
+
+// Handle ICE candidate exchange
+peerConnection.onicecandidate = (event) => {
+    if (event.candidate) {
+        socket.emit("ice-candidate", event.candidate);
+    }
+};
+
+// Send call request
+function startCall() {
+    peerConnection.createOffer()
+        .then(offer => {
+            peerConnection.setLocalDescription(offer);
+            socket.emit("send-offer", offer);
+        });
+}
+
+// Listen for incoming offer
+socket.on("receive-offer", (offer) => {
+    peerConnection.setRemoteDescription(new RTCSessionDescription(offer))
+        .then(() => peerConnection.createAnswer())
+        .then(answer => {
+            peerConnection.setLocalDescription(answer);
+            socket.emit("send-answer", answer);
+        });
+});
+
+// Listen for incoming answer
+socket.on("receive-answer", (answer) => {
+    peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+});
+
+// Handle ICE candidate exchange
+socket.on("receive-ice-candidate", (candidate) => {
+    peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+});
+
+
+module.exports = (server) => {
+    const io = require("socket.io")(server, {
+        cors: { origin: "*" }
+    });
+
+    io.on("connection", (socket) => {
+        console.log("User connected:", socket.id);
+
+        // Handle offer
+        socket.on("send-offer", (offer) => {
+            socket.broadcast.emit("receive-offer", offer);
+        });
+
+        // Handle answer
+        socket.on("send-answer", (answer) => {
+            socket.broadcast.emit("receive-answer", answer);
+        });
+
+        // Handle ICE candidates
+        socket.on("ice-candidate", (candidate) => {
+            socket.broadcast.emit("receive-ice-candidate", candidate);
+        });
+
+        socket.on("disconnect", () => {
+            console.log("User disconnected:", socket.id);
+        });
+    });
+
+    return io;
+};
+
+
+const jwt=require("jsonwebtoken");
+const jToken=require("./config/jwt.json").JWT_SECRET;
+
+module.exports = (server) => {
+    const io = require("socket.io")(server, {
+        cors: { origin: "*" }
+    });
+
+    const waitingUsers=[];
+
+    io.use((socket, next) => {
+        const token = socket.handshake.auth?.token; // Retrieve token from handshake
+        if (!token) {
+            return next(new Error("Authentication error: No token provided"));
+        }
+
+        try {
+            const decoded = jwt.verify(token, jToken);
+            socket.userid = decoded.userid; // Attach user data to the socket
+            socket.name=decoded.name;
+            console.log(decoded);
+            next(); // Proceed with the connection
+        } catch (err) {
+            console.log(err);
+            socket.emit("sft_data", {err: "invalid-token"});
+            socket.disconnect();
+        }
+    });
+
+    io.on("connection", (socket) => {
+        console.log("User connected:", socket.id);
+
+        socket.on("find-match", () => {
+            console.log("Find match");
+        
+            if (waitingUsers.length > 0) {
+                const partnerId = waitingUsers.pop();
+                const partnerSocket = io.sockets.sockets.get(partnerId);
+        
+                if (partnerSocket) {
+                    // Assign roles explicitly
+                    socket.peer=partnerSocket;
+                    socket.role="donor";
+                    partnerSocket.peer=socket;
+                    partnerSocket.role="receiver";
+                    io.to(socket.id).emit("match-found", { partnerId: partnerId, userid: partnerSocket.userid, name: partnerSocket.name, role: "donor" });
+                    io.to(partnerId).emit("match-found", { partnerId: socket.id, userid: socket.userid, name: socket.name, role: "receiver" });
+                } else {
+                    // Partner disconnected, re-add the current user to the waiting list
+                    waitingUsers.push(socket.id);
+                }
+            } else {
+                // No partner available, add the current user to the waiting list
+                waitingUsers.push(socket.id);
+            }
+        });
+
+        
+        // Handle offer
+        socket.on("send-offer", (offer) => {
+            io.to(socket.peer.id).emit("receive-offer", offer);
+        });
+
+        // Handle answer
+        socket.on("send-answer", (answer) => {
+            io.to(socket.peer.id).emit("receive-answer", answer);
+        });
+
+        // Handle ICE candidates
+        socket.on("ice-candidate", (candidate) => {
+            io.to(socket.peer.id).emit("receive-ice-candidate", candidate);
+        });
+
+        socket.on("disconnect", () => {
+            console.log("User disconnected:", socket.id);
+        });
+    });
+
+    return io;
+};

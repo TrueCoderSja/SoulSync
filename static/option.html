@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Options - SoulSync</title>
+  <link rel="stylesheet" href="styles.css"> <!-- External CSS -->
+</head>
+<body>
+
+  <!-- Header Section -->
+  <header>
+    <div class="logo">💖 SoulSync</div>
+    <div class="profile-container">
+      <div class="profile-info">
+        <span class="username">Hi, John Doe 👋</span> <!-- Replace with dynamic user data -->
+        <a href="logout.html" class="logout-button">Log Out</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="heart-container"></div> <!-- Background Hearts -->
+
+  <div class="options-container">
+    <h1>Welcome to SoulSync 💖</h1>
+    <p>Choose an option to connect with your soulmate! 💕</p>
+
+    <div class="buttons">
+      <a href="vc.html" class="option-button">🎙️ Audio Chat / Call</a>
+      <a href="#" class="option-button">📞 Voice Call / Chat</a>
+      <a href="#" class="option-button">👫 Friend List</a>
+      <a href="#" class="option-button">💬 Simple Chat</a>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      let heartContainer = document.querySelector(".heart-container");
+
+      function createHeart() {
+        let heart = document.createElement("div");
+        heart.className = "heart";
+        heart.style.left = Math.random() * 100 + "vw";
+        heart.style.animationDuration = Math.random() * 5 + 3 + "s";
+        heart.style.animationDelay = Math.random() * 2 + "s";
+        heartContainer.appendChild(heart);
+
+        setTimeout(() => {
+          heart.remove();
+        }, 8000);
+      }
+
+      setInterval(createHeart, 500);
+    });
+  </script>
+
+</body>
+</html>

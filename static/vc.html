@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Video Chat</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #121212;
+        }
+        .container {
+            display: flex;
+            gap: 15px;
+            max-width: 1100px;
+            width: 100%;
+        }
+        .video-container {
+            position: relative;
+            flex: 2;
+            aspect-ratio: 16 / 9;
+            background: black;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #remoteVideo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        #localVideo {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            width: 150px;
+            height: 100px;
+            border-radius: 8px;
+            border: 2px solid white;
+            object-fit: cover;
+            background: black;
+        }
+        .partner-overlay {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .controls {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .controls.show {
+            opacity: 1;
+        }
+        button {
+            background: #FF5252;
+            color: white;
+            padding: 10px 15px;
+            font-size: 14px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            background: #FF1744;
+        }
+        #connectBtn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 12px 20px;
+            font-size: 18px;
+            background: #00C853;
+        }
+
+        /* Chatbox styles */
+        .chat-container {
+            flex: 1;
+            max-width: 300px;
+            background: #1E1E1E;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            height: 100%;
+        }
+        .chat-header {
+            background: #333;
+            padding: 10px;
+            color: white;
+            text-align: center;
+            font-weight: bold;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .partner-info {
+            font-size: 12px;
+            color: #bbb;
+            margin-top: 5px;
+        }
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            color: white;
+        }
+        .chat-input {
+            display: flex;
+            border-top: 1px solid #444;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: #292929;
+            color: white;
+        }
+        .chat-input button {
+            padding: 10px;
+            background: #00C853;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .chat-input button:hover {
+            background: #00A844;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="video-container">
+            <video id="remoteVideo" autoplay playsinline></video>
+            <video id="localVideo" autoplay playsinline muted></video>
+            <button id="connectBtn" onclick="findMatch()">Connect to Random</button>
+            <div class="partner-overlay" id="partnerOverlay">Waiting for match...</div>
+            <div class="controls" id="controls">
+                <button onclick="toggleMute()">Mute</button>
+                <button onclick="toggleVideo()">Stop Video</button>
+                <button onclick="disconnectCall()">Disconnect</button>
+            </div>
+        </div>
+        
+        <!-- Chatbox -->
+        <div class="chat-container">
+            <div class="chat-header">
+                Chat
+                <div class="partner-info" id="partnerInfo">Waiting for match...</div>
+            </div>
+            <div class="chat-messages" id="chatMessages"></div>
+            <div class="chat-input">
+                <input type="text" id="chatInput" placeholder="Type a message...">
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

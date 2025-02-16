@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register - SoulSync</title>
+  <style>
+    /* General Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #ff4b2b, #ff1053, #b23a48, #ff758c);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Background Heart Animation */
+    @keyframes floatingHearts {
+      0% { transform: translateY(100vh) scale(0.5); opacity: 1; }
+      50% { transform: translateY(50vh) scale(1); opacity: 0.8; }
+      100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
+    }
+
+    .heart {
+      position: absolute;
+      width: 25px;
+      height: 25px;
+      background-color: red;
+      clip-path: polygon(50% 0%, 100% 35%, 75% 100%, 50% 80%, 25% 100%, 0% 35%);
+      animation: floatingHearts 6s infinite;
+      opacity: 0;
+    }
+
+    /* Site Name Styling */
+    .site-name {
+      font-size: 3rem;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 30px;
+      color: #fff;
+      text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.7);
+      animation: glowEffect 2s infinite alternate;
+      z-index: 1;
+    }
+
+    @keyframes glowEffect {
+      0% { text-shadow: 3px 3px 10px rgba(255, 20, 147, 0.7); }
+      100% { text-shadow: 5px 5px 15px rgba(255, 105, 180, 1); }
+    }
+
+    /* Form Container */
+    .register-container {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(12px);
+      border-radius: 15px;
+      padding: 40px;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      animation: fadeIn 1s ease-in-out;
+      z-index: 1;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .register-container h1 {
+      color: #fff;
+      font-size: 2rem;
+      margin-bottom: 20px;
+    }
+
+    .register-container p {
+      color: #e0e0e0;
+      font-size: 0.9rem;
+      margin-bottom: 30px;
+    }
+
+    /* Input Fields */
+    .input-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    .input-group label {
+      display: block;
+      color: #fff;
+      font-size: 0.9rem;
+      margin-bottom: 5px;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.3s ease;
+    }
+
+    .input-group input:focus {
+      border-color: #ff4b2b;
+    }
+
+    /* Button */
+    .register-button {
+      width: 100%;
+      padding: 12px;
+      background: #ff416c;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+
+    .register-button:hover {
+      background: #b23a48;
+      transform: scale(1.05);
+    }
+
+    /* Floating Hearts Container */
+    .heart-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 0;
+    }
+  </style>
+  <script src="verify.js"></script>
+</head>
+<body>
+  <div class="heart-container"></div>
+
+  <div class="site-name">SoulSync</div>
+
+  <div class="register-container">
+    <h1>Verify OTP</h1>
+    <form id="register-form">
+      <div class="input-group">
+        <label for="email">College Email</label>
+        <input type="email" id="email" placeholder="Enter OTP sent to your email:" required>
+      </div>
+      <button type="submit" class="register-button" id="submit-btn">Verify</button>
+      <div class="error-message" id="error-message" style="display:none; color: #ff6b6b; font-size: 0.9rem; margin-top: 10px;">
+        Please enter a valid OTP.
+      </div>
+    </form>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      let heartContainer = document.querySelector(".heart-container");
+
+      function createHeart() {
+        let heart = document.createElement("div");
+        heart.className = "heart";
+        heart.style.left = Math.random() * 100 + "vw";
+        heart.style.animationDuration = Math.random() * 3 + 3 + "s";
+        heart.style.animationDelay = Math.random() * 2 + "s";
+        heartContainer.appendChild(heart);
+
+        // Remove heart after animation ends
+        setTimeout(() => {
+          heart.remove();
+        }, 6000);
+      }
+
+      // Generate hearts continuously
+      setInterval(createHeart, 300);
+    });
+  </script>
+</body>
+</html>
