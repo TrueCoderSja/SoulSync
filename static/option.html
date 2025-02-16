@@ -1,11 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Options - SoulSync</title>
   <link rel="stylesheet" href="styles.css"> <!-- External CSS -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const userData = JSON.parse(localStorage.getItem("userData")); // Retrieve and parse data
+
+      if (userData) { // Ensure userData exists
+        document.querySelectorAll(".username").forEach(element => {
+          element.innerText = userData.name;
+        });
+      }
+    });
+  </script>
 </head>
+
 <body>
 
   <!-- Header Section -->
@@ -55,4 +68,5 @@
   </script>
 
 </body>
+
 </html>
